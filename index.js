@@ -63,30 +63,40 @@ function GenerateFeedList() {
 
     feeds.forEach((feed, index) => {
       let date = new Date(feed.Time);
+      let dayName = Days[date.getUTCDay()];
+      let totalMinutes = date.getHours() * 60 + date.getMinutes(); // Convert feed time to minutes
+
+      if (!dailyTotals[dayName]) {
+        dailyTotals[dayName] = {
+          Value: 0,
+          TotalBottles: 0,
+          TotalMinutes: [],
+        };
+      }
+
+      dailyTotals[dayName].Value += Number(feed.Value);
+      dailyTotals[dayName].TotalBottles += 1;
+      dailyTotals[dayName].TotalMinutes.push(totalMinutes); // Store time in minutes
+
       let li = document.createElement("li");
       li.className = "feed-item";
-      li.innerHTML = `<span>${Days[date.getUTCDay()]} ${
-        date.getHours() % 12 || 12
-      }:${date.getMinutes().toString().padStart(2, "0")} ${
+      li.innerHTML = `<span>${dayName} ${date.getHours() % 12 || 12}:${date
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")} ${
         date.getHours() >= 12 ? "PM" : "AM"
       }</span> <span>Drank: ${
         feed.Value
       } oz</span> <button class="delete-button" data-index="${index}">Delete</button>`;
 
       FeedList.appendChild(li);
-
-      let dayName = Days[date.getUTCDay()];
-      if (!dailyTotals[dayName]) {
-        dailyTotals[dayName] = 0;
-      }
-      dailyTotals[dayName] += Number(feed.Value);
     });
 
     feedDiv.appendChild(FeedList);
 
     const deleteButtons = document.querySelectorAll(".delete-button");
     deleteButtons.forEach((button) => {
-      button.addEventListener("click", (e) => {
+      button.addEventListener("click", () => {
         const index = parseInt(button.getAttribute("data-index"), 10);
         DeleteFeedItem(index);
       });
@@ -96,13 +106,47 @@ function GenerateFeedList() {
     TotalsDiv.style.marginTop = "20px";
     TotalsDiv.innerHTML = "<h3>Daily Totals</h3>";
     const TotalsList = document.createElement("ul");
+
     for (let day in dailyTotals) {
+      dailyTotals[day].TotalMinutes.sort((a, b) => a - b);
+
+      let totalDiff = 0;
+      let avgHours = 0;
+      let avgMins = 0;
+
+      if (dailyTotals[day].TotalBottles > 1) {
+        for (let i = 1; i < dailyTotals[day].TotalMinutes.length; i++) {
+          totalDiff +=
+            dailyTotals[day].TotalMinutes[i] -
+            dailyTotals[day].TotalMinutes[i - 1];
+        }
+        let avgMinutes = Math.round(
+          totalDiff / (dailyTotals[day].TotalBottles - 1)
+        );
+        avgHours = Math.floor(avgMinutes / 60);
+        avgMins = avgMinutes % 60;
+      }
+
       let totalLi = document.createElement("li");
-      totalLi.textContent = `${day}: ${dailyTotals[day]} oz, ${(
-        Number(dailyTotals[day]) * 28.6
-      ).toFixed()} ml`;
+      let liHTML = `${day}: <strong>${
+        dailyTotals[day].Value
+      }</strong> oz, <strong>${(
+        Number(dailyTotals[day].Value) * 28.6
+      ).toFixed()}</strong> ml, <strong>${
+        dailyTotals[day].TotalBottles
+      }</strong> bottle`;
+
+      if (dailyTotals[day].TotalBottles > 1) {
+        liHTML += "s";
+        liHTML += `, Avg: <strong>${avgHours}h:${avgMins
+          .toString()
+          .padStart(2, "0")}m</strong>`;
+      }
+
+      totalLi.innerHTML = liHTML;
       TotalsList.appendChild(totalLi);
     }
+
     TotalsDiv.appendChild(TotalsList);
     feedDiv.appendChild(TotalsDiv);
   }
