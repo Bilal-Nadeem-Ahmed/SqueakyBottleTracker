@@ -9,8 +9,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
 
+  box-sizing: border-box;
+}
+h3 {
+  text-align: center;
+  margin-top: 0px !important;
+}
 /* Header Styles */
 .header-container {
   display: flex;
@@ -19,6 +24,7 @@ body {
   background-color: #1565c0; /* Navy blue header */
   color: white;
   padding: 20px;
+  height: 10vh;
   width: 100%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -87,7 +93,6 @@ dialog button:hover {
 }
 
 #previous-feeds {
-  margin-top: 10px;
   padding: 10px;
   width: 100%;
   max-width: 500px;
@@ -95,6 +100,15 @@ dialog button:hover {
   border: 1px solid #b3e5fc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 80vh;
+}
+.feed-list {
+  height: 39vh;
+  overflow-y: auto;
+}
+.daily-totals-list {
+  height: 30vh;
+  overflow-y: auto;
 }
 
 .feed-item {
@@ -151,7 +165,7 @@ dialog button:hover {
     } */
 
   dialog {
-    width: 100%;
+    width: 80%;
   }
 
   #previous-feeds {
@@ -161,7 +175,7 @@ dialog button:hover {
 
 #add-bottle {
   position: fixed;
-  bottom: 20px;
+  bottom: 80px;
   right: 20px;
   background-color: #00acc1;
   color: white;
@@ -176,4 +190,36 @@ dialog button:hover {
 
 #add-bottle:hover {
   background-color: #00838f;
+}
+.daily-total {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid #b3e5fc;
+  background-color: #e1f5fe;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.daily-total__day {
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.daily-total__values {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.daily-total__values div {
+  flex: 1;
+  min-width: 100px;
+}
+
+.daily-total__avg {
+  font-size: 0.9em;
+  color: #666;
 }

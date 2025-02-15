@@ -13,7 +13,7 @@ window.onload = function () {
   timeInput.type = "datetime-local";
   timeInput.id = "feed-time";
   timeInput.value = new Date().toISOString().slice(0, 16);
-  // set min date to 6 days ago
+
   timeInput.setAttribute(
     "min",
     new Date(new Date().setDate(new Date().getDate() - 6))
@@ -58,7 +58,9 @@ function GenerateFeedList() {
     feedDiv.innerText = "No Data To Display! Add A Feed";
   } else {
     feedDiv.innerText = "";
+    feedDiv.innerHTML = "<h3>Bottles</h3>";
     const FeedList = document.createElement("ul");
+    FeedList.classList.add("feed-list");
     const dailyTotals = {};
 
     feeds.forEach((feed, index) => {
@@ -106,6 +108,7 @@ function GenerateFeedList() {
     TotalsDiv.style.marginTop = "20px";
     TotalsDiv.innerHTML = "<h3>Daily Totals</h3>";
     const TotalsList = document.createElement("ul");
+    TotalsList.classList.add("daily-totals-list");
 
     for (let day in dailyTotals) {
       dailyTotals[day].TotalMinutes.sort((a, b) => a - b);
@@ -128,20 +131,31 @@ function GenerateFeedList() {
       }
 
       let totalLi = document.createElement("li");
-      let liHTML = `${day}: <strong>${
-        dailyTotals[day].Value
-      }</strong> oz, <strong>${(
-        Number(dailyTotals[day].Value) * 28.6
-      ).toFixed()}</strong> ml, <strong>${
-        dailyTotals[day].TotalBottles
-      }</strong> bottle`;
+      totalLi.classList.add("daily-total");
 
-      if (dailyTotals[day].TotalBottles > 1) {
-        liHTML += "s";
-        liHTML += `, Avg: <strong>${avgHours}h:${avgMins
-          .toString()
-          .padStart(2, "0")}m</strong>`;
-      }
+      let liHTML = `
+  <div class="daily-total__day">
+    <span>${day}</span>
+    ${
+      dailyTotals[day].TotalBottles > 1
+        ? `
+      <span class="daily-total__avg">
+        Avg: <strong>${avgHours}h:${avgMins
+            .toString()
+            .padStart(2, "0")}m</strong>
+      </span>`
+        : ""
+    }
+  </div>
+  <div class="daily-total__values">
+    <div><strong>${dailyTotals[day].Value}</strong> oz</div>
+    <div><strong>${(
+      Number(dailyTotals[day].Value) * 28.6
+    ).toFixed()}</strong> ml</div>
+    <div><strong>${dailyTotals[day].TotalBottles}</strong> 🍼</div>
+  </div>`;
+
+      totalLi.innerHTML = liHTML;
 
       totalLi.innerHTML = liHTML;
       TotalsList.appendChild(totalLi);
