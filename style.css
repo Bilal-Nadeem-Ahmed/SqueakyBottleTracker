@@ -174,9 +174,10 @@ dialog button:hover {
 }
 
 #add-bottle {
-  position: fixed;
+  /* position: fixed;
   bottom: 80px;
-  right: 20px;
+  right: 20px; */
+  margin-left: 10px;
   background-color: #00acc1;
   color: white;
   padding: 15px;
@@ -199,6 +200,7 @@ dialog button:hover {
   background-color: #e1f5fe;
   padding: 10px;
   margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 .daily-total__day {
