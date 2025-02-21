@@ -151,7 +151,7 @@ function GenerateFeedList() {
     });
 
     const TotalsDiv = document.createElement("div");
-    TotalsDiv.style.margin = "10px";
+
     TotalsDiv.innerHTML = "<h3>Daily Totals</h3>";
     const TotalsList = document.createElement("ul");
     TotalsList.classList.add("daily-totals-list");
@@ -180,27 +180,30 @@ function GenerateFeedList() {
       totalLi.classList.add("daily-total");
 
       let liHTML = `
-  <div class="daily-total__day">
-    <span>${day}</span>
-    ${
-      dailyTotals[day].TotalBottles > 1
-        ? `
-      <span class="daily-total__avg">
-        Avg: <strong>${avgHours}h:${avgMins
-            .toString()
-            .padStart(2, "0")}m</strong>
-      </span>`
-        : ""
-    }
-  </div>
+ 
   <div class="daily-total__values">
+  <div><strong>${day}</strong> </div>
+  <div><strong>${
+    dailyTotals[day].TotalBottles
+  }</strong> <span class='b-emogi'>🍼<span></div>
     <div><strong>${dailyTotals[day].Value}</strong> oz</div>
     <div><strong>${(
       Number(dailyTotals[day].Value) * 28.6
     ).toFixed()}</strong> ml</div>
-    <div><strong>${dailyTotals[day].TotalBottles}</strong> 🍼</div>
-    <div><strong>${dailyTotals[day].TotalNappies}</strong> 💩</div>
-  </div>`;
+    <div><div><strong>${
+      dailyTotals[day].TotalNappies
+    }</strong> </div><div class='p-emogi'>💩</div></div>
+    ${
+      dailyTotals[day].TotalBottles > 1
+        ? `
+      <span >
+      <strong>  Avg: </strong>${avgHours}h:${avgMins
+            .toString()
+            .padStart(2, "0")}m
+      </span>`
+        : "<div>Only one feed</div>"
+    }
+  </div> `;
 
       totalLi.innerHTML = liHTML;
 

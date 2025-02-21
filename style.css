@@ -109,11 +109,11 @@ dialog button:hover {
   height: 80vh;
 }
 .feed-list {
-  height: 36vh;
+  height: 40vh;
   overflow-y: scroll;
 }
 .daily-totals-list {
-  height: 38vh;
+  height: 32.5vh;
   overflow-y: auto;
 }
 
@@ -121,7 +121,7 @@ dialog button:hover {
   list-style-type: none;
   border: 1px solid #b3e5fc;
   background-color: #e1f5fe;
-  padding: 5px 10px;
+  padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
   display: flex;
@@ -145,8 +145,7 @@ dialog button:hover {
 
 /* Daily Totals Styles */
 #previous-feeds h3 {
-  margin-top: 20px;
-  margin-bottom: 10px;
+  margin: 10px !important;
   font-size: 18px;
   color: #1565c0; /* Navy blue */
 }
@@ -203,7 +202,7 @@ dialog button:hover {
   flex-direction: column;
   border: 1px solid #b3e5fc;
   background-color: #e1f5fe;
-  padding: 5px 10px;
+  padding: 10px;
   margin-bottom: 10px;
   border-radius: 5px;
 }
@@ -221,7 +220,8 @@ dialog button:hover {
 }
 
 .daily-total__values div {
-  flex: 1;
+  display: flex;
+  align-items: end;
 }
 
 .daily-total__avg {
