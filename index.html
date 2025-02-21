@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bottle Tracker</title>
-    <script src="index.js"></script>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="header-container">
-      <h1>👶Bottle Tracker</h1>
-      <button style="" id="add-bottle">＋🍼</button>
-    </div>
 
-    <dialog>
-      <input id="add-feed" type="number" placeholder="Amount (oz)" />
-      <button autofocus>Submit</button>
-    </dialog>
-    <div id="previous-feeds"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bottle Tracker</title>
+  <script src="index.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="header-container">
+    <h1>👶Bottle Tracker</h1>
+    <button class="add-button" id="add-bottle">+🍼</button>
+    <button class="add-button" id="add-nappy">+💩</button>
+    <!-- <button class="add-button" id="add-medicine">+💊</button> -->
+  </div>
+
+  <dialog id="feed-dialog">
+    <input id="add-feed" type="number" placeholder="Amount (oz)" />
+    <button autofocus>Submit</button>
+  </dialog>
+
+  <div id="previous-feeds"></div>
+</body>
+
 </html>

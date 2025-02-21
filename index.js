@@ -1,13 +1,26 @@
 let addBottleButton = undefined;
+let addNappyButton = undefined;
+let addMedicineButton = undefined;
 let feedDiv = undefined;
 let feeds = [];
 const Days = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
 
+const TypeEnum = {
+  Bottle: "Bottle",
+  Nappy: "Nappy",
+  Medicine: "Medicine",
+};
+const TypeSymbols = {
+  Bottle: "🍼",
+  Nappy: "💩",
+  Medicine: "💊",
+};
+
 window.onload = function () {
   addBottleButton = document.getElementById("add-bottle");
   feedDiv = document.getElementById("previous-feeds");
-  const dialog = document.querySelector("dialog");
-  const closeButton = document.querySelector("dialog button");
+  const feedDialog = document.getElementById("feed-dialog");
+  const closeButton = document.querySelector("#feed-dialog button");
   const feedInput = document.getElementById("add-feed");
   const timeInput = document.createElement("input");
   timeInput.type = "datetime-local";
@@ -21,22 +34,23 @@ window.onload = function () {
       .slice(0, 16)
   );
 
-  dialog.insertBefore(timeInput, closeButton);
+  feedDialog.insertBefore(timeInput, closeButton);
 
+  InitialiseNappyFunctionality();
   RemoveOverOneWeek();
-
   GenerateFeedList();
 
   addBottleButton?.addEventListener("click", (e) => {
     e.preventDefault();
     timeInput.value = new Date().toISOString().slice(0, 16);
-    dialog.showModal();
+    feedDialog.showModal();
   });
 
   closeButton.addEventListener("click", () => {
     let currentFeed = {
       Time: new Date(timeInput.value) || new Date(),
       Value: parseFloat(feedInput.value) || 0,
+      Type: TypeEnum.Bottle,
     };
 
     if (currentFeed.Value > 0) {
@@ -48,10 +62,33 @@ window.onload = function () {
       feedInput.value = "";
     }
 
-    dialog.close();
+    feedDialog.close();
     GenerateFeedList();
   });
 };
+function InitialiseNappyFunctionality() {
+  //
+  addNappyButton = document.getElementById("add-nappy");
+
+  addNappyButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    let currentNappy = {
+      Time: new Date(),
+      Value: 1,
+      Type: TypeEnum.Nappy,
+    };
+
+    let items = JSON.parse(localStorage.getItem("FeedList")) ?? [];
+    items.push(currentNappy);
+    items.sort((a, b) => new Date(a.Time) - new Date(b.Time));
+    feeds = items;
+
+    localStorage.setItem("FeedList", JSON.stringify(items));
+
+    GenerateFeedList();
+  });
+}
 
 function GenerateFeedList() {
   if (!feeds.length) {
@@ -73,23 +110,33 @@ function GenerateFeedList() {
           Value: 0,
           TotalBottles: 0,
           TotalMinutes: [],
+          TotalNappies: 0,
         };
       }
 
-      dailyTotals[dayName].Value += Number(feed.Value);
-      dailyTotals[dayName].TotalBottles += 1;
-      dailyTotals[dayName].TotalMinutes.push(totalMinutes); // Store time in minutes
+      if (feed.Type === TypeEnum.Bottle) {
+        dailyTotals[dayName].Value += Number(feed.Value);
+        dailyTotals[dayName].TotalBottles += 1;
+        dailyTotals[dayName].TotalMinutes.push(totalMinutes); // Store time in minutes
+      }
+      if (feed.Type === TypeEnum.Nappy) {
+        dailyTotals[dayName].TotalNappies += 1;
+      }
 
       let li = document.createElement("li");
+      // add the symbols below
       li.className = "feed-item";
-      li.innerHTML = `<span>${dayName} ${date.getHours() % 12 || 12}:${date
-        .getMinutes()
-        .toString()
-        .padStart(2, "0")} ${
+
+      let initialHTML = `<span>${TypeSymbols[feed.Type]} ${dayName} ${
+        date.getHours() % 12 || 12
+      }:${date.getMinutes().toString().padStart(2, "0")} ${
         date.getHours() >= 12 ? "PM" : "AM"
-      }</span> <span>Drank: ${
-        feed.Value
-      } oz</span> <button class="delete-button" data-index="${index}">Delete</button>`;
+      }</span > `;
+      let middleHTML = ``;
+      if (feed.Type === TypeEnum.Bottle) {
+        middleHTML = `<span>Drank: ${feed.Value} oz</span>`;
+      }
+      li.innerHTML = ` ${initialHTML} ${middleHTML} <button class="delete-button" data-index="${index}">Delete</button>`;
 
       FeedList.appendChild(li);
     });
@@ -153,6 +200,7 @@ function GenerateFeedList() {
       Number(dailyTotals[day].Value) * 28.6
     ).toFixed()}</strong> ml</div>
     <div><strong>${dailyTotals[day].TotalBottles}</strong> 🍼</div>
+    <div><strong>${dailyTotals[day].TotalNappies}</strong> 💩</div>
   </div>`;
 
       totalLi.innerHTML = liHTML;
@@ -163,6 +211,17 @@ function GenerateFeedList() {
 
     TotalsDiv.appendChild(TotalsList);
     feedDiv.appendChild(TotalsDiv);
+    const previousFeed = document.querySelector(".feed-list");
+    const totals = document.querySelector(".daily-totals-list");
+
+    previousFeed.scrollTo({
+      top: previousFeed.scrollHeight,
+      behavior: "smooth",
+    });
+    totals.scrollTo({
+      top: totals.scrollHeight,
+      behavior: "smooth",
+    });
   }
 }
 
@@ -177,12 +236,18 @@ function RemoveOverOneWeek() {
   const items = List ? JSON.parse(List) : [];
 
   const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 6);
 
   if (items.length > 0) {
     const inDateItems = items.filter(
       (item) => new Date(item.Time) >= oneWeekAgo
     );
+    // remove in a week
+    items.forEach((item) => {
+      if (!item.Type) {
+        item.Type = TypeEnum.Bottle;
+      }
+    });
     inDateItems.sort((a, b) => new Date(a.Time) - new Date(b.Time));
     feeds = inDateItems;
     localStorage.setItem("FeedList", JSON.stringify(inDateItems));

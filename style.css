@@ -23,10 +23,13 @@ h3 {
   align-items: center;
   background-color: #1565c0; /* Navy blue header */
   color: white;
-  padding: 20px;
+  padding: 10px;
   height: 10vh;
   width: 100%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+h1 {
+  font-size: 1.5em;
 }
 
 .header-image {
@@ -173,14 +176,14 @@ dialog button:hover {
   }
 }
 
-#add-bottle {
+.add-button {
   /* position: fixed;
   bottom: 80px;
   right: 20px; */
   margin-left: 10px;
   background-color: #00acc1;
   color: white;
-  padding: 15px;
+  padding: 10px;
   border-radius: 25px;
   font-size: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -189,7 +192,7 @@ dialog button:hover {
   transition: background-color 0.3s ease;
 }
 
-#add-bottle:hover {
+.add-button:hover {
   background-color: #00838f;
 }
 .daily-total {
@@ -213,12 +216,11 @@ dialog button:hover {
 .daily-total__values {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 
 .daily-total__values div {
   flex: 1;
-  min-width: 100px;
+  min-width: 80px;
 }
 
 .daily-total__avg {
