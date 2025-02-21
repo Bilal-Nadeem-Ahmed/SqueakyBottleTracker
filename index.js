@@ -29,7 +29,7 @@ window.onload = function () {
 
   timeInput.setAttribute(
     "min",
-    new Date(new Date().setDate(new Date().getDate() - 6))
+    new Date(new Date().setDate(new Date().getDate() - 5))
       .toISOString()
       .slice(0, 16)
   );
@@ -95,7 +95,6 @@ function GenerateFeedList() {
     feedDiv.innerText = "No Data To Display! Add A Feed";
   } else {
     feedDiv.innerText = "";
-    feedDiv.innerHTML = "<h3>Bottles</h3>";
     const FeedList = document.createElement("ul");
     FeedList.classList.add("feed-list");
     const dailyTotals = {};
@@ -152,7 +151,7 @@ function GenerateFeedList() {
     });
 
     const TotalsDiv = document.createElement("div");
-    TotalsDiv.style.marginTop = "20px";
+    TotalsDiv.style.margin = "10px";
     TotalsDiv.innerHTML = "<h3>Daily Totals</h3>";
     const TotalsList = document.createElement("ul");
     TotalsList.classList.add("daily-totals-list");

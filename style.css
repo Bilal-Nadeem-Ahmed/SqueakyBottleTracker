@@ -9,7 +9,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+* {
   box-sizing: border-box;
 }
 h3 {
@@ -106,11 +109,11 @@ dialog button:hover {
   height: 80vh;
 }
 .feed-list {
-  height: 39vh;
-  overflow-y: auto;
+  height: 36vh;
+  overflow-y: scroll;
 }
 .daily-totals-list {
-  height: 30vh;
+  height: 38vh;
   overflow-y: auto;
 }
 
@@ -118,7 +121,7 @@ dialog button:hover {
   list-style-type: none;
   border: 1px solid #b3e5fc;
   background-color: #e1f5fe;
-  padding: 10px;
+  padding: 5px 10px;
   margin-bottom: 10px;
   border-radius: 5px;
   display: flex;
@@ -198,10 +201,9 @@ dialog button:hover {
 .daily-total {
   display: flex;
   flex-direction: column;
-  padding: 10px;
   border: 1px solid #b3e5fc;
   background-color: #e1f5fe;
-  padding: 10px;
+  padding: 5px 10px;
   margin-bottom: 10px;
   border-radius: 5px;
 }
@@ -220,7 +222,6 @@ dialog button:hover {
 
 .daily-total__values div {
   flex: 1;
-  min-width: 80px;
 }
 
 .daily-total__avg {
