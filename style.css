@@ -12,13 +12,16 @@ body {
   max-height: 100vh;
   box-sizing: border-box;
 }
+
 * {
   box-sizing: border-box;
 }
+
 h3 {
   text-align: center;
   margin-top: 0px !important;
 }
+
 /* Header Styles */
 .header-container {
   display: flex;
@@ -31,8 +34,13 @@ h3 {
   width: 100%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 h1 {
   font-size: 1.5em;
+}
+.daily-total-medicines {
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .header-image {
@@ -41,22 +49,7 @@ h1 {
   margin-right: 10px;
 }
 
-/* #add-bottle {
-    padding: 10px 20px;
-    background-color: #00ACC1; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    margin: 20px 0;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#add-bottle:hover {
-    background-color: #00838F; 
-} */
-
+/* Dialog Box Styling */
 dialog {
   border: 1px solid #1565c0;
   border-radius: 8px;
@@ -72,6 +65,7 @@ dialog {
   border-radius: 10px;
   overflow-x: hidden;
 }
+
 dialog::backdrop {
   background: rgba(0, 0, 0, 0.5);
 }
@@ -108,10 +102,12 @@ dialog button:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: 80vh;
 }
+
 .feed-list {
   height: 40vh;
   overflow-y: scroll;
 }
+
 .daily-totals-list {
   height: 32.5vh;
   overflow-y: auto;
@@ -165,10 +161,6 @@ dialog button:hover {
     height: 80px;
   }
 
-  /* #add-bottle {
-        width: 90%;
-    } */
-
   dialog {
     width: 80%;
   }
@@ -178,10 +170,8 @@ dialog button:hover {
   }
 }
 
+/* Add Button Styles */
 .add-button {
-  /* position: fixed;
-  bottom: 80px;
-  right: 20px; */
   margin-left: 10px;
   background-color: #00acc1;
   color: white;
@@ -197,6 +187,30 @@ dialog button:hover {
 .add-button:hover {
   background-color: #00838f;
 }
+
+/* Medicine Specific Styling */
+/* #medicine-dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.medicine-input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #1565c0;
+  border-radius: 4px;
+}
+
+.medicine-dosage {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #1565c0;
+  border-radius: 4px;
+} */
+
 .daily-total {
   display: flex;
   flex-direction: column;
@@ -216,7 +230,7 @@ dialog button:hover {
 
 .daily-total__values {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .daily-total__values div {

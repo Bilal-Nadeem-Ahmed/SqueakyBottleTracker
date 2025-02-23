@@ -14,11 +14,19 @@
     <h1>👶Tracker</h1>
     <button class="add-button" id="add-bottle">+🍼</button>
     <button class="add-button" id="add-nappy">+💩</button>
-    <!-- <button class="add-button" id="add-medicine">+💊</button> -->
+    <button class="add-button" id="add-medicine">+💊</button>
   </div>
 
   <dialog id="feed-dialog">
     <input id="add-feed" type="number" placeholder="Amount (oz)" />
+    <button autofocus>Submit</button>
+  </dialog>
+  <dialog id="medicine-dialog">
+    <select id="medicine-type" class="medicine-input">
+      <option value="Paracetamol">Paracetamol</option>
+      <option value="Ibuprofen">Ibuprofen</option>
+      <option value="Antibiotics">Antibiotics</option>
+    </select>
     <button autofocus>Submit</button>
   </dialog>
 

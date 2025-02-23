@@ -15,6 +15,22 @@ const TypeSymbols = {
   Nappy: "💩",
   Medicine: "💊",
 };
+const MedicineType = {
+  Paracetamol: "Paracetamol",
+  Ibuprofen: "Ibuprofen",
+  Antibiotics: "Antibiotics",
+};
+const MedicineSymbols = {
+  Paracetamol: "⚪",
+  Ibuprofen: "🔴",
+  Antibiotics: "💊",
+};
+
+const MedicineIntervals = {
+  Paracetamol: 4,
+  Ibuprofen: 6,
+  Antibiotics: 8,
+};
 
 window.onload = function () {
   addBottleButton = document.getElementById("add-bottle");
@@ -23,6 +39,7 @@ window.onload = function () {
   const closeButton = document.querySelector("#feed-dialog button");
   const feedInput = document.getElementById("add-feed");
   const timeInput = document.createElement("input");
+  addMedicineButton = document.getElementById("add-medicine");
   timeInput.type = "datetime-local";
   timeInput.id = "feed-time";
   timeInput.value = new Date().toISOString().slice(0, 16);
@@ -37,6 +54,7 @@ window.onload = function () {
   feedDialog.insertBefore(timeInput, closeButton);
 
   InitialiseNappyFunctionality();
+  InitialiseMedicineFunctionality();
   RemoveOverOneWeek();
   GenerateFeedList();
 
@@ -89,6 +107,50 @@ function InitialiseNappyFunctionality() {
     GenerateFeedList();
   });
 }
+function InitialiseMedicineFunctionality() {
+  // Ensure the event listener is only attached after the page has loaded
+  addMedicineButton?.addEventListener("click", () => {
+    const medicineDialog = document.getElementById("medicine-dialog");
+    const medicineTypeSelect = document.getElementById("medicine-type");
+
+    // Open the dialog when the button is clicked
+    medicineDialog.showModal();
+
+    const submitButton = medicineDialog.querySelector("button");
+
+    // Handle form submission inside the dialog
+    submitButton.addEventListener("click", () => {
+      const medicineType = medicineTypeSelect.value;
+
+      if (!medicineType) {
+        alert("Please select a valid medicine type.");
+        return;
+      }
+
+      const now = new Date();
+      const nextDue = new Date(now);
+      nextDue.setHours(now.getHours() + MedicineIntervals[medicineType]);
+
+      let newMedicine = {
+        Time: now,
+        Type: TypeEnum.Medicine,
+        Medicine: medicineType,
+        NextDue: nextDue,
+      };
+
+      let items = JSON.parse(localStorage.getItem("FeedList")) ?? [];
+      items.push(newMedicine);
+      items.sort((a, b) => new Date(a.Time) - new Date(b.Time));
+      feeds = items;
+
+      localStorage.setItem("FeedList", JSON.stringify(items));
+      GenerateFeedList();
+
+      // Close the dialog after submission
+      medicineDialog.close();
+    });
+  });
+}
 
 function GenerateFeedList() {
   if (!feeds.length) {
@@ -110,6 +172,11 @@ function GenerateFeedList() {
           TotalBottles: 0,
           TotalMinutes: [],
           TotalNappies: 0,
+          ToTalMedicine: {
+            Paracetamol: 0,
+            Ibuprofen: 0,
+            Antibiotics: 0,
+          },
         };
       }
 
@@ -121,19 +188,36 @@ function GenerateFeedList() {
       if (feed.Type === TypeEnum.Nappy) {
         dailyTotals[dayName].TotalNappies += 1;
       }
+      if (feed.Type === TypeEnum.Medicine) {
+        dailyTotals[dayName].ToTalMedicine[feed.Medicine] += 1;
+      }
 
       let li = document.createElement("li");
       // add the symbols below
       li.className = "feed-item";
 
-      let initialHTML = `<span>${TypeSymbols[feed.Type]} ${dayName} ${
-        date.getHours() % 12 || 12
-      }:${date.getMinutes().toString().padStart(2, "0")} ${
-        date.getHours() >= 12 ? "PM" : "AM"
-      }</span > `;
+      let initialHTML = `<span>${
+        feed.Type === TypeEnum.Medicine
+          ? `${MedicineSymbols[feed.Medicine]} `
+          : TypeSymbols[feed.Type]
+      } ${dayName} ${date.getHours() % 12 || 12}:${date
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")} ${date.getHours() >= 12 ? "PM" : "AM"}</span > ${
+        feed.Type === TypeEnum.Medicine
+          ? `<span><strong>Next Due:</strong> ${
+              new Date(feed.NextDue).getHours() % 12 || 12
+            }:${new Date(feed.NextDue)
+              .getMinutes()
+              .toString()
+              .padStart(2, "0")} ${
+              new Date(feed.NextDue).getHours() >= 12 ? "PM" : "AM"
+            }</span>`
+          : ""
+      }`;
       let middleHTML = ``;
       if (feed.Type === TypeEnum.Bottle) {
-        middleHTML = `<span>Drank: ${feed.Value} oz</span>`;
+        middleHTML = `<span><strong>Drank:</strong> ${feed.Value} oz</span>`;
       }
       li.innerHTML = ` ${initialHTML} ${middleHTML} <button class="delete-button" data-index="${index}">Delete</button>`;
 
@@ -180,30 +264,44 @@ function GenerateFeedList() {
       totalLi.classList.add("daily-total");
 
       let liHTML = `
- 
-  <div class="daily-total__values">
-  <div><strong>${day}</strong> </div>
-  <div><strong>${
-    dailyTotals[day].TotalBottles
-  }</strong> <span class='b-emogi'>🍼<span></div>
-    <div><strong>${dailyTotals[day].Value}</strong> oz</div>
-    <div><strong>${(
-      Number(dailyTotals[day].Value) * 28.6
-    ).toFixed()}</strong> ml</div>
-    <div><div><strong>${
-      dailyTotals[day].TotalNappies
-    }</strong> </div><div class='p-emogi'>💩</div></div>
-    ${
-      dailyTotals[day].TotalBottles > 1
-        ? `
-      <span >
-      <strong>  Avg: </strong>${avgHours}h:${avgMins
-            .toString()
-            .padStart(2, "0")}m
-      </span>`
-        : "<div>Only one feed</div>"
-    }
-  </div> `;
+        <div class="daily-total__values">
+          <div><strong>${day}</strong> </div>
+          <div><strong>${
+            dailyTotals[day].TotalBottles
+          }</strong> <span class='b-emogi'>🍼</span></div>
+          <div><strong>${dailyTotals[day].Value}</strong> oz</div>
+          <div><strong>${(
+            Number(dailyTotals[day].Value) * 28.6
+          ).toFixed()}</strong> ml</div>
+          
+          ${
+            dailyTotals[day].TotalBottles > 1
+              ? `
+                <span >
+                  <strong>  Avg: </strong>${avgHours}h:${avgMins
+                  .toString()
+                  .padStart(2, "0")}m
+                </span>`
+              : "<div>Only one feed</div>"
+          }
+          <div><div><strong>${
+            dailyTotals[day].TotalNappies
+          }</strong> </div><div class='p-emogi'>💩</div></div>
+          
+        
+         
+        </div> <div class="daily-total-medicines">
+            
+          
+              ${Object.keys(dailyTotals[day].ToTalMedicine)
+                .map((medicine) =>
+                  dailyTotals[day].ToTalMedicine[medicine] > 0
+                    ? `<div>${MedicineSymbols[medicine]}: ${dailyTotals[day].ToTalMedicine[medicine]}</div>`
+                    : ""
+                )
+                .join("")}
+           
+          </div>`;
 
       totalLi.innerHTML = liHTML;
 
