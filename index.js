@@ -107,6 +107,8 @@ function InitialiseNappyFunctionality() {
     GenerateFeedList();
   });
 }
+let medicineSubmitListenerAdded = false;
+
 function InitialiseMedicineFunctionality() {
   // Ensure the event listener is only attached after the page has loaded
   addMedicineButton?.addEventListener("click", () => {
@@ -116,39 +118,44 @@ function InitialiseMedicineFunctionality() {
     // Open the dialog when the button is clicked
     medicineDialog.showModal();
 
-    const submitButton = medicineDialog.querySelector("button");
+    const submitButton = document.getElementById("medicine-submit");
 
-    // Handle form submission inside the dialog
-    submitButton.addEventListener("click", () => {
-      const medicineType = medicineTypeSelect.value;
+    // Add the event listener only once to prevent duplicates
+    if (!medicineSubmitListenerAdded) {
+      submitButton.addEventListener("click", () => {
+        const medicineType = medicineTypeSelect.value;
 
-      if (!medicineType) {
-        alert("Please select a valid medicine type.");
-        return;
-      }
+        if (!medicineType) {
+          alert("Please select a valid medicine type.");
+          return;
+        }
 
-      const now = new Date();
-      const nextDue = new Date(now);
-      nextDue.setHours(now.getHours() + MedicineIntervals[medicineType]);
+        const now = new Date();
+        const nextDue = new Date(now);
+        nextDue.setHours(now.getHours() + MedicineIntervals[medicineType]);
 
-      let newMedicine = {
-        Time: now,
-        Type: TypeEnum.Medicine,
-        Medicine: medicineType,
-        NextDue: nextDue,
-      };
+        let newMedicine = {
+          Time: now,
+          Type: TypeEnum.Medicine,
+          Medicine: medicineType,
+          NextDue: nextDue,
+        };
 
-      let items = JSON.parse(localStorage.getItem("FeedList")) ?? [];
-      items.push(newMedicine);
-      items.sort((a, b) => new Date(a.Time) - new Date(b.Time));
-      feeds = items;
+        let items = JSON.parse(localStorage.getItem("FeedList")) ?? [];
+        items.push(newMedicine);
+        items.sort((a, b) => new Date(a.Time) - new Date(b.Time));
+        feeds = items;
 
-      localStorage.setItem("FeedList", JSON.stringify(items));
-      GenerateFeedList();
+        localStorage.setItem("FeedList", JSON.stringify(items));
+        GenerateFeedList();
 
-      // Close the dialog after submission
-      medicineDialog.close();
-    });
+        // Close the dialog after submission
+        medicineDialog.close();
+      });
+
+      // Set flag to true, so we don't add the listener again
+      medicineSubmitListenerAdded = true;
+    }
   });
 }
 
