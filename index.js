@@ -42,13 +42,13 @@ window.onload = function () {
   addMedicineButton = document.getElementById("add-medicine");
   timeInput.type = "datetime-local";
   timeInput.id = "feed-time";
-  timeInput.value = new Date().toISOString().slice(0, 16);
+  timeInput.value = getLocalDateTimeString(new Date());
 
   timeInput.setAttribute(
     "min",
-    new Date(new Date().setDate(new Date().getDate() - 5))
-      .toISOString()
-      .slice(0, 16)
+    getLocalDateTimeString(
+      new Date(new Date().setDate(new Date().getDate() - 5))
+    )
   );
 
   feedDialog.insertBefore(timeInput, closeButton);
@@ -60,7 +60,7 @@ window.onload = function () {
 
   addBottleButton?.addEventListener("click", (e) => {
     e.preventDefault();
-    timeInput.value = new Date().toISOString().slice(0, 16);
+    timeInput.value = getLocalDateTimeString(new Date());
     feedDialog.showModal();
   });
 
@@ -157,6 +157,12 @@ function InitialiseMedicineFunctionality() {
       medicineSubmitListenerAdded = true;
     }
   });
+}
+
+function getLocalDateTimeString(date) {
+  const offset = date.getTimezoneOffset();
+  const localDate = new Date(date.getTime() - offset * 60 * 1000);
+  return localDate.toISOString().slice(0, 16);
 }
 
 function GenerateFeedList() {
