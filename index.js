@@ -176,7 +176,7 @@ function GenerateFeedList() {
 
     feeds.forEach((feed, index) => {
       let date = new Date(feed.Time);
-      let dayName = Days[date.getUTCDay()];
+      let dayName = Days[date.getDay()];
       let totalMinutes = date.getHours() * 60 + date.getMinutes(); // Convert feed time to minutes
 
       if (!dailyTotals[dayName]) {
