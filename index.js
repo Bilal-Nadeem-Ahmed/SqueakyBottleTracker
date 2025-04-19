@@ -109,7 +109,6 @@ function showChartsDiv() {
 
   const ctx = document.getElementById("feedChart").getContext("2d");
 
-  // Ensure feeds are loaded
   const allFeeds = feeds.length
     ? feeds
     : JSON.parse(localStorage.getItem("FeedList")) ?? [];
@@ -124,16 +123,14 @@ function showChartsDiv() {
     const date = new Date(feed.Time);
     const key = `${date.getFullYear()}-${
       date.getMonth() + 1
-    }-${date.getDate()}`; // e.g. "2025-4-19"
+    }-${date.getDate()}`;
 
     if (!dailyTotalsMap[key]) {
       dailyTotalsMap[key] = {
         totalOz: 0,
         label: `${Days[date.getDay()]} ${date.getDate()} ${date.toLocaleString(
           "default",
-          {
-            month: "short",
-          }
+          { month: "short" }
         )}`,
       };
     }
@@ -141,7 +138,6 @@ function showChartsDiv() {
     dailyTotalsMap[key].totalOz += Number(feed.Value);
   });
 
-  // Get labels and data
   const sortedKeys = Object.keys(dailyTotalsMap).sort(
     (a, b) => new Date(a) - new Date(b)
   );
@@ -199,7 +195,6 @@ function showChartsDiv() {
 }
 
 function InitialiseNappyFunctionality() {
-  //
   addNappyButton = document.getElementById("add-nappy");
 
   addNappyButton?.addEventListener("click", (e) => {
@@ -221,56 +216,58 @@ function InitialiseNappyFunctionality() {
     GenerateFeedList();
   });
 }
+
 let medicineSubmitListenerAdded = false;
 
 function InitialiseMedicineFunctionality() {
-  // Ensure the event listener is only attached after the page has loaded
+  const medicineDialog = document.getElementById("medicine-dialog");
+  const medicineTypeSelect = document.getElementById("medicine-type");
+  const submitButton = document.getElementById("medicine-submit");
+
+  const medicineTimeInput = document.createElement("input");
+  medicineTimeInput.type = "datetime-local";
+  medicineTimeInput.id = "medicine-time";
+  medicineDialog.insertBefore(medicineTimeInput, submitButton);
+
   addMedicineButton?.addEventListener("click", () => {
-    const medicineDialog = document.getElementById("medicine-dialog");
-    const medicineTypeSelect = document.getElementById("medicine-type");
-
-    // Open the dialog when the button is clicked
+    // Set to now every time the dialog opens
+    medicineTimeInput.value = getLocalDateTimeString(new Date());
     medicineDialog.showModal();
-
-    const submitButton = document.getElementById("medicine-submit");
-
-    // Add the event listener only once to prevent duplicates
-    if (!medicineSubmitListenerAdded) {
-      submitButton.addEventListener("click", () => {
-        const medicineType = medicineTypeSelect.value;
-
-        if (!medicineType) {
-          alert("Please select a valid medicine type.");
-          return;
-        }
-
-        const now = new Date();
-        const nextDue = new Date(now);
-        nextDue.setHours(now.getHours() + MedicineIntervals[medicineType]);
-
-        let newMedicine = {
-          Time: now,
-          Type: TypeEnum.Medicine,
-          Medicine: medicineType,
-          NextDue: nextDue,
-        };
-
-        let items = JSON.parse(localStorage.getItem("FeedList")) ?? [];
-        items.push(newMedicine);
-        items.sort((a, b) => new Date(a.Time) - new Date(b.Time));
-        feeds = items;
-
-        localStorage.setItem("FeedList", JSON.stringify(items));
-        GenerateFeedList();
-
-        // Close the dialog after submission
-        medicineDialog.close();
-      });
-
-      // Set flag to true, so we don't add the listener again
-      medicineSubmitListenerAdded = true;
-    }
   });
+
+  if (!medicineSubmitListenerAdded) {
+    submitButton.addEventListener("click", () => {
+      const medicineType = medicineTypeSelect.value;
+      const selectedTime = new Date(medicineTimeInput.value || new Date());
+
+      if (!medicineType) {
+        alert("Please select a valid medicine type.");
+        return;
+      }
+
+      const nextDue = new Date(selectedTime);
+      nextDue.setHours(nextDue.getHours() + MedicineIntervals[medicineType]);
+
+      let newMedicine = {
+        Time: selectedTime,
+        Type: TypeEnum.Medicine,
+        Medicine: medicineType,
+        NextDue: nextDue,
+      };
+
+      let items = JSON.parse(localStorage.getItem("FeedList")) ?? [];
+      items.push(newMedicine);
+      items.sort((a, b) => new Date(a.Time) - new Date(b.Time));
+      feeds = items;
+
+      localStorage.setItem("FeedList", JSON.stringify(items));
+      GenerateFeedList();
+
+      medicineDialog.close();
+    });
+
+    medicineSubmitListenerAdded = true;
+  }
 }
 
 function getLocalDateTimeString(date) {
