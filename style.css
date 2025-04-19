@@ -102,6 +102,17 @@ dialog button:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   height: 80vh;
 }
+#charts {
+  padding: 10px;
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff;
+  border: 1px solid #b3e5fc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: auto;
+  margin-top: 10vh;
+}
 
 .feed-list {
   height: 40vh;

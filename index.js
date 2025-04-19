@@ -1,7 +1,9 @@
 let addBottleButton = undefined;
 let addNappyButton = undefined;
 let addMedicineButton = undefined;
+let viewChartButton = undefined;
 let feedDiv = undefined;
+let chartDiv = undefined;
 let feeds = [];
 const Days = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
 
@@ -34,7 +36,9 @@ const MedicineIntervals = {
 
 window.onload = function () {
   addBottleButton = document.getElementById("add-bottle");
+  viewChartButton = document.getElementById("view-charts");
   feedDiv = document.getElementById("previous-feeds");
+  chartDiv = document.getElementById("charts");
   const feedDialog = document.getElementById("feed-dialog");
   const closeButton = document.querySelector("#feed-dialog button");
   const feedInput = document.getElementById("add-feed");
@@ -43,6 +47,8 @@ window.onload = function () {
   timeInput.type = "datetime-local";
   timeInput.id = "feed-time";
   timeInput.value = getLocalDateTimeString(new Date());
+
+  showFeedDiv();
 
   timeInput.setAttribute(
     "min",
@@ -55,13 +61,19 @@ window.onload = function () {
 
   InitialiseNappyFunctionality();
   InitialiseMedicineFunctionality();
-  RemoveOverOneWeek();
+  RemoveOverThreeMonth();
   GenerateFeedList();
 
   addBottleButton?.addEventListener("click", (e) => {
+    showFeedDiv();
     e.preventDefault();
     timeInput.value = getLocalDateTimeString(new Date());
     feedDialog.showModal();
+  });
+
+  viewChartButton?.addEventListener("click", (e) => {
+    e.preventDefault();
+    showChartsDiv();
   });
 
   closeButton.addEventListener("click", () => {
@@ -84,6 +96,108 @@ window.onload = function () {
     GenerateFeedList();
   });
 };
+
+function showFeedDiv() {
+  feedDiv.style.display = "block";
+  chartDiv.style.display = "none";
+}
+function showChartsDiv() {
+  feedDiv.style.display = "none";
+  chartDiv.style.display = "block";
+  chartDiv.innerHTML =
+    '<canvas id="feedChart" width="400" height="200"></canvas>';
+
+  const ctx = document.getElementById("feedChart").getContext("2d");
+
+  // Ensure feeds are loaded
+  const allFeeds = feeds.length
+    ? feeds
+    : JSON.parse(localStorage.getItem("FeedList")) ?? [];
+
+  const bottleFeeds = allFeeds
+    .filter((f) => f.Type === TypeEnum.Bottle)
+    .sort((a, b) => new Date(a.Time) - new Date(b.Time));
+
+  const dailyTotalsMap = {};
+
+  bottleFeeds.forEach((feed) => {
+    const date = new Date(feed.Time);
+    const key = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`; // e.g. "2025-4-19"
+
+    if (!dailyTotalsMap[key]) {
+      dailyTotalsMap[key] = {
+        totalOz: 0,
+        label: `${Days[date.getDay()]} ${date.getDate()} ${date.toLocaleString(
+          "default",
+          {
+            month: "short",
+          }
+        )}`,
+      };
+    }
+
+    dailyTotalsMap[key].totalOz += Number(feed.Value);
+  });
+
+  // Get labels and data
+  const sortedKeys = Object.keys(dailyTotalsMap).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
+  const labels = sortedKeys.map((k) => dailyTotalsMap[k].label);
+  const data = sortedKeys.map((k) => dailyTotalsMap[k].totalOz);
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Daily Total Oz Drank",
+          data,
+          fill: true,
+          backgroundColor: "rgba(75, 192, 192, 0.2)",
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.3,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return `${context.raw} oz total`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Date",
+          },
+        },
+        y: {
+          title: {
+            display: true,
+            text: "Oz Drank",
+          },
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+}
+
 function InitialiseNappyFunctionality() {
   //
   addNappyButton = document.getElementById("add-nappy");
@@ -176,7 +290,12 @@ function GenerateFeedList() {
 
     feeds.forEach((feed, index) => {
       let date = new Date(feed.Time);
-      let dayName = Days[date.getDay()];
+      let dayName = `${
+        Days[date.getDay()]
+      } ${date.getDate()} ${date.toLocaleString("default", {
+        month: "short",
+      })}`;
+
       let totalMinutes = date.getHours() * 60 + date.getMinutes(); // Convert feed time to minutes
 
       if (!dailyTotals[dayName]) {
@@ -344,16 +463,16 @@ function DeleteFeedItem(index) {
   GenerateFeedList();
 }
 
-function RemoveOverOneWeek() {
+function RemoveOverThreeMonth() {
   const List = localStorage.getItem("FeedList");
   const items = List ? JSON.parse(List) : [];
 
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 6);
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
   if (items.length > 0) {
     const inDateItems = items.filter(
-      (item) => new Date(item.Time) >= oneWeekAgo
+      (item) => new Date(item.Time) >= threeMonthsAgo
     );
     // remove in a week
     items.forEach((item) => {
