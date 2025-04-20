@@ -113,6 +113,9 @@ dialog button:hover {
   height: auto;
   margin-top: 10vh;
 }
+.total-day {
+  font-size: 0.8em;
+}
 
 .feed-list {
   height: 40vh;

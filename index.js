@@ -105,7 +105,7 @@ function showChartsDiv() {
   feedDiv.style.display = "none";
   chartDiv.style.display = "block";
   chartDiv.innerHTML =
-    '<canvas id="feedChart" width="400" height="200"></canvas>';
+    '<canvas id="feedChart" width="600" height="400"></canvas>';
 
   const ctx = document.getElementById("feedChart").getContext("2d");
 
@@ -230,7 +230,6 @@ function InitialiseMedicineFunctionality() {
   medicineDialog.insertBefore(medicineTimeInput, submitButton);
 
   addMedicineButton?.addEventListener("click", () => {
-    // Set to now every time the dialog opens
     medicineTimeInput.value = getLocalDateTimeString(new Date());
     medicineDialog.showModal();
   });
@@ -289,9 +288,12 @@ function GenerateFeedList() {
       let date = new Date(feed.Time);
       let dayName = `${
         Days[date.getDay()]
-      } ${date.getDate()} ${date.toLocaleString("default", {
-        month: "short",
-      })}`;
+      } <span class="total-day"> ${date.getDate()} ${date.toLocaleString(
+        "default",
+        {
+          month: "short",
+        }
+      )}</span>`;
 
       let totalMinutes = date.getHours() * 60 + date.getMinutes(); // Convert feed time to minutes
 
@@ -325,7 +327,7 @@ function GenerateFeedList() {
       // add the symbols below
       li.className = "feed-item";
 
-      let initialHTML = `<span>${
+      let initialHTML = `<span class="total-day">${
         feed.Type === TypeEnum.Medicine
           ? `${MedicineSymbols[feed.Medicine]} `
           : TypeSymbols[feed.Type]
@@ -334,7 +336,7 @@ function GenerateFeedList() {
         .toString()
         .padStart(2, "0")} ${date.getHours() >= 12 ? "PM" : "AM"}</span > ${
         feed.Type === TypeEnum.Medicine
-          ? `<span><strong>Next Due:</strong> ${
+          ? `<span class="total-day"><strong>Due:</strong> ${
               new Date(feed.NextDue).getHours() % 12 || 12
             }:${new Date(feed.NextDue)
               .getMinutes()
@@ -346,7 +348,7 @@ function GenerateFeedList() {
       }`;
       let middleHTML = ``;
       if (feed.Type === TypeEnum.Bottle) {
-        middleHTML = `<span><strong>Drank:</strong> ${feed.Value} oz</span>`;
+        middleHTML = `<span class="total-day"><strong>Drank:</strong> ${feed.Value} oz</span>`;
       }
       li.innerHTML = ` ${initialHTML} ${middleHTML} <button class="delete-button" data-index="${index}">Delete</button>`;
 
@@ -393,11 +395,11 @@ function GenerateFeedList() {
       totalLi.classList.add("daily-total");
 
       let liHTML = `
-        <div class="daily-total__values">
-          <div><strong>${day}</strong> </div>
+        <div class="daily-total__values total-day">
+          <div><strong >${day}</strong> </div>
           <div><strong>${
             dailyTotals[day].TotalBottles
-          }</strong> <span class='b-emogi'>🍼</span></div>
+          }</strong><span class='b-emogi'>🍼</span></div>
           <div><strong>${dailyTotals[day].Value}</strong> oz</div>
           <div><strong>${(
             Number(dailyTotals[day].Value) * 28.6
@@ -411,13 +413,15 @@ function GenerateFeedList() {
                   .toString()
                   .padStart(2, "0")}m
                 </span>`
-              : "<div>Only one feed</div>"
+              : dailyTotals[day].TotalBottles === 1
+              ? `<div>Only one feed</div>`
+              : "<div>No Feeds</div>"
           }
-          <div><div><strong>${
-            dailyTotals[day].TotalNappies
-          }</strong> </div><div class='p-emogi'>💩</div></div>
-          
-        
+              ${
+                dailyTotals[day].TotalNappies > 0
+                  ? ` <div><div><strong>${dailyTotals[day].TotalNappies}</strong> </div><div class='p-emogi'>💩</div></div>`
+                  : ""
+              }
          
         </div> <div class="daily-total-medicines">
             
@@ -425,7 +429,7 @@ function GenerateFeedList() {
               ${Object.keys(dailyTotals[day].ToTalMedicine)
                 .map((medicine) =>
                   dailyTotals[day].ToTalMedicine[medicine] > 0
-                    ? `<div>${MedicineSymbols[medicine]}: ${dailyTotals[day].ToTalMedicine[medicine]}</div>`
+                    ? `<div class="total-day">${MedicineSymbols[medicine]}: ${dailyTotals[day].ToTalMedicine[medicine]}</div>`
                     : ""
                 )
                 .join("")}
