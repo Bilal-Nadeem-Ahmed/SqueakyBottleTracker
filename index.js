@@ -29,9 +29,9 @@ const MedicineSymbols = {
 };
 
 const MedicineIntervals = {
-  Paracetamol: 4,
-  Ibuprofen: 6,
-  Antibiotics: 8,
+  Paracetamol: 5,
+  Ibuprofen: 8,
+  Antibiotics: 6,
 };
 
 window.onload = function () {
@@ -53,8 +53,8 @@ window.onload = function () {
   timeInput.setAttribute(
     "min",
     getLocalDateTimeString(
-      new Date(new Date().setDate(new Date().getDate() - 5))
-    )
+      new Date(new Date().setDate(new Date().getDate() - 5)),
+    ),
   );
 
   feedDialog.insertBefore(timeInput, closeButton);
@@ -111,7 +111,7 @@ function showChartsDiv() {
 
   const allFeeds = feeds.length
     ? feeds
-    : JSON.parse(localStorage.getItem("FeedList")) ?? [];
+    : (JSON.parse(localStorage.getItem("FeedList")) ?? []);
 
   const bottleFeeds = allFeeds
     .filter((f) => f.Type === TypeEnum.Bottle)
@@ -130,7 +130,7 @@ function showChartsDiv() {
         totalOz: 0,
         label: `${Days[date.getDay()]} ${date.getDate()} ${date.toLocaleString(
           "default",
-          { month: "short" }
+          { month: "short" },
         )}`,
       };
     }
@@ -139,7 +139,7 @@ function showChartsDiv() {
   });
 
   const sortedKeys = Object.keys(dailyTotalsMap).sort(
-    (a, b) => new Date(a) - new Date(b)
+    (a, b) => new Date(a) - new Date(b),
   );
   const labels = sortedKeys.map((k) => dailyTotalsMap[k].label);
   const data = sortedKeys.map((k) => dailyTotalsMap[k].totalOz);
@@ -292,7 +292,7 @@ function GenerateFeedList() {
         "default",
         {
           month: "short",
-        }
+        },
       )}</span>`;
 
       let totalMinutes = date.getHours() * 60 + date.getMinutes(); // Convert feed time to minutes
@@ -385,7 +385,7 @@ function GenerateFeedList() {
             dailyTotals[day].TotalMinutes[i - 1];
         }
         let avgMinutes = Math.round(
-          totalDiff / (dailyTotals[day].TotalBottles - 1)
+          totalDiff / (dailyTotals[day].TotalBottles - 1),
         );
         avgHours = Math.floor(avgMinutes / 60);
         avgMins = avgMinutes % 60;
@@ -410,12 +410,12 @@ function GenerateFeedList() {
               ? `
                 <span >
                   <strong>  Avg: </strong>${avgHours}h:${avgMins
-                  .toString()
-                  .padStart(2, "0")}m
+                    .toString()
+                    .padStart(2, "0")}m
                 </span>`
               : dailyTotals[day].TotalBottles === 1
-              ? `<div>Only one feed</div>`
-              : "<div>No Feeds</div>"
+                ? `<div>Only one feed</div>`
+                : "<div>No Feeds</div>"
           }
               ${
                 dailyTotals[day].TotalNappies > 0
@@ -430,7 +430,7 @@ function GenerateFeedList() {
                 .map((medicine) =>
                   dailyTotals[day].ToTalMedicine[medicine] > 0
                     ? `<div class="total-day">${MedicineSymbols[medicine]}: ${dailyTotals[day].ToTalMedicine[medicine]}</div>`
-                    : ""
+                    : "",
                 )
                 .join("")}
            
@@ -473,7 +473,7 @@ function RemoveOverThreeMonth() {
 
   if (items.length > 0) {
     const inDateItems = items.filter(
-      (item) => new Date(item.Time) >= threeMonthsAgo
+      (item) => new Date(item.Time) >= threeMonthsAgo,
     );
     // remove in a week
     items.forEach((item) => {
